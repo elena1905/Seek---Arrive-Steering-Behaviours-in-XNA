@@ -30,7 +30,6 @@ namespace WindowsGame2
             if (mState.LeftButton == ButtonState.Pressed)
             {
                 PlayerTank tank = (PlayerTank) Game1.Instance.children.ElementAt(0);
-                tank.targetPos = Position;
             }
         }
         public override void Draw(GameTime gameTime)

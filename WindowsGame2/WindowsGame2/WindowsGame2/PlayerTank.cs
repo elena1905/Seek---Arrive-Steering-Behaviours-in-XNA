@@ -18,11 +18,12 @@ namespace WindowsGame2
 
         // The sound effect to play when firing
         SoundEffect Sound;
-        public Vector2 targetPos;
         public Vector2 velocity;
         float mass = 1;
         float maxSpeed = 150;
         float maxForce = 50;
+
+        Path path = new Path();
 
         // gets called from LoadContennt in game1
         public override void LoadContent()
@@ -44,28 +45,65 @@ namespace WindowsGame2
             
             Center.Y = Sprite.Height / 2;
 
+            path.Looped = true;
+            Random r = new Random(DateTime.Now.Millisecond);
+            for (int i = 0 ; i < 5 ; i ++)
+            {
+                Vector2 pos = new Vector2(
+                    r.Next(Game1.Instance.graphics.PreferredBackBufferWidth) 
+                    ,r.Next(Game1.Instance.graphics.PreferredBackBufferHeight)
+                    );
+                path.AddWayPoint(pos);
+            }
+            
             base.LoadContent();
-
         }
 
-        Vector2 arrive()
+        Vector2 followPath()
         {
-            float slowing = 100.0f;
+            float epsilon = 20.0f;
+
+            float dist = (Position - path.NextWaypoint()).Length();
+            if (dist < epsilon)
+            {
+                path.Advance();
+            }
+            if (!path.Looped && path.AtEnd)
+            {
+                return arrive(path.NextWaypoint());
+            }
+            else
+            {
+                return seek(path.NextWaypoint());
+            }
+        }
+
+        Vector2 arrive(Vector2 targetPos)
+        {
+            float slowingDistance = 100.0f;
+
             Vector2 targetOffest = targetPos - Position;
-            float dist = targetOffest.Length();
-            float ramped = maxSpeed * (dist / slowing);
-            float clipped = Math.Min(maxSpeed, ramped);
-            Vector2 desired = (clipped / dist) * targetOffest;
-            return (desired - velocity) * 8.0f;
+
+            float distance = targetOffest.Length();
+            if (distance > 0.0f)
+            {
+                float ramped = maxSpeed * (distance / slowingDistance);
+                float clipped = Math.Min(ramped, maxSpeed);
+                Vector2 desired = (clipped / distance) * targetOffest;
+                return (desired - velocity) * 8.0f;
+            }
+            else
+            {
+                return Vector2.Zero;
+            }
         }
         
 
-        Vector2 flee()
+        Vector2 flee(Vector2 targetPos)
         {
-
             Vector2 desired = targetPos - Position;
-            float dist = desired.Length();
-            if (dist < 50)
+
+            if (desired.Length() < 100.0f)
             {
                 desired.Normalize();
                 desired *= maxSpeed;
@@ -81,9 +119,11 @@ namespace WindowsGame2
             {
                 return Vector2.Zero;
             }
+
+
         }
 
-        Vector2 seek()
+        Vector2 seek(Vector2 targetPos)
         {
             Vector2 desired = targetPos - Position;
             desired.Normalize();
@@ -107,7 +147,7 @@ namespace WindowsGame2
             float timeDelta = (float) gameTime.ElapsedGameTime.TotalSeconds;
             float speed = 100.0f;
 
-            Vector2 acceleration = arrive() / mass;
+            Vector2 acceleration = followPath() / mass;
             velocity = velocity + acceleration * timeDelta;
             if (velocity.Length() > maxSpeed)
             {

@@ -110,6 +110,7 @@
     <Compile Include="Bullet.cs" />
     <Compile Include="Cursor.cs" />
     <Compile Include="GameEntity.cs" />
+    <Compile Include="Path.cs" />
     <Compile Include="PlayerTank.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
