@@ -14,8 +14,6 @@ namespace WindowsGame2
     // PlayerTank extends GameEntity, so we cal add it to the scene graph (i.e. the list<GameEntity> in Game1)
     class PlayerTank:GameEntity
     {
-        
-
         // The sound effect to play when firing
         SoundEffect Sound;
         public Vector2 velocity;
@@ -24,6 +22,9 @@ namespace WindowsGame2
         float maxForce = 50;
 
         Path path = new Path();
+
+        // Used to draw texts
+        private SpriteFont Font { get; set; }
 
         // gets called from LoadContennt in game1
         public override void LoadContent()
@@ -55,6 +56,8 @@ namespace WindowsGame2
                     );
                 path.AddWayPoint(pos);
             }
+
+            Font = Game1.Instance.Content.Load<SpriteFont>(@"SpriteFont1");
             
             base.LoadContent();
         }
@@ -119,8 +122,6 @@ namespace WindowsGame2
             {
                 return Vector2.Zero;
             }
-
-
         }
 
         Vector2 seek(Vector2 targetPos)
@@ -169,8 +170,17 @@ namespace WindowsGame2
 
         public override void Draw(GameTime gameTime)
         {
+            // Draw waypoints at their positions
+            for (int i = 0; i < path.waypoints.Count(); i++)
+            {
+                Vector2 posVect = path.waypoints.ElementAt(i);
+                string posText = (i + 1) + ":" + posVect.X + "," + posVect.Y;
+
+                Game1.Instance.spriteBatch.DrawString(Font, posText, posVect, Color.Black);
+            }
+
             // Draw the tank sprite
             Game1.Instance.spriteBatch.Draw(Sprite, Position, null, Color.White, Rotation, Center, 1, SpriteEffects.None, 1);
-        }        
+        }
     }
 }

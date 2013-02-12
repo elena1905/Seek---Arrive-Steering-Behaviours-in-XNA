@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace WindowsGame2
 {
     class Path:GameEntity
     {
-        List<Vector2> waypoints = new List<Vector2>();
-
-        // Used to draw texts
-        private SpriteFont Font { get; set; }
+        public List<Vector2> waypoints = new List<Vector2>();
 
         bool looped;
 
@@ -52,19 +48,6 @@ namespace WindowsGame2
                     current++;
                 }
             }
-        }
-
-        public override void LoadContent()
-        {
-            Font = Game1.Instance.Content.Load<SpriteFont>(@"Fonts\font1");
-            
-            base.LoadContent();
-        }
-
-        public override void Draw(GameTime gameTime)
-        {
-            // Draw positions
-            Game1.Instance.spriteBatch.DrawString(Font, "hello", new Vector2(50, 50), Color.Black);
         }
     }
 }
